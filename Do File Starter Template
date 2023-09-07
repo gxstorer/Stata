@@ -8,45 +8,49 @@ set varabbrev 	off
 ********************************************************************************
 
 * Set Working Directory	******************************************************** Remember PC paths use "\" while MacOS use "/" paths
-// 																				 Either set wd to current project that has folders: 
-// 																				 Original, Working_Data, & Outputs.
-//																				 Or use the following globals:
+// 																				 	Either set wd to current project that has folders: 
+// 																				 	Original, Working_Data, & Outputs.
+//																				 	Or use the following globals:
 	local 		WD 				"x" 											// (Required) // Replace "x" with path for WD manually. Using locals due to it's defined endline symbol is easier to fit in the root path code.
 	local 		OS				"x" 											// (Required) // Replace "x" with "/" for MacOS, OR "\" for PC	
 	local 		data_dir 		`WD'Original`OS' 	 							// Path to source data
 	local 		work_dir 		`WD'Working_Data`OS' 							// Path to any produced data files within project
 	local 		output_dir 		`WD'Outputs`OS' 								// Path to any produced materials from project (e.g. Tables, Graphs, etc.)
 
-* Set General Tables Format ************************************************************// Set to default format, with options to customize.
+* Set General Tables Format ****************************************************// Set of commands that will be applied to all tables.
 	
-	global 		table_format 		"replace compress nogaps"						// (Optional)   "replace"/"ammend" = overwrite file, "compress" = table width, 
-// 																							    "nogaps"/"gaps" = table height	
+	global 		table_format 	"replace label compress nogaps"					// (Optional)   "replace"/"ammend" = overwrite file, "label" = use of var labels instad of var names,  
+// 																							    	"compress" = table width, "nogaps"/"gaps" = table height	
 	
-* Set Regression Table Format ************************************************************// Set to default format, with options to customize.
+* Set Regression Table Format **************************************************// Set to default format, with options to customize.
 	
 	global 		RT_title		"title("")"										// (Required) // For mutliple lines, use "Line1" "Line2" for multiple line.
-//																								 Remove if blank. 
-
-	global 		RT_columns 		"mtitles("") "   								// (Required) // Customize table columns by order L-R : "Name1" "Name2" ...
-// 																								 Remove if not customized. 
-//																				(NOTE) Removes dependent variable displaued. 
-// 																						May need to add note or use different command.	
-	global 		RT_coef			"label coeflabels( _cons "Constant" )"			// (Optional) Customize all coefficients with coeflabels: (var) "New Name" ...
+//																								 	Remove if blank. 
+	global 		RT_columns 		"mtitles("") "   		// (Required) // Customize table columns by order L-R : "Name1" "Name2" ...
+// 																								 	Remove if not customized. 
+//																								 	(NOTE) Removes dependent variable displayed. 
+// 																									May need to add note or use different command.	
+	global 		RT_coef			"coeflabels( _cons "Constant" )"				// (Optional) Customize all coefficients with coeflabels: (var) "New Name" ...
 	global 		RT_decimal		"2"												// (Optional) default set for 2 decimal points for both coefficient & SE.
 	global 		RT_stars		"star(* .10 ** .05 *** .01)"					// (Optional) To change, order within goes: (symbol) (value) ...
 	global 		RT_SE			"Standard"										// (Optional) Replace "Standard" with type of standard errors if not normal.
-// 																							  Enter term you want listed that precedes the word "Errors."
-	global 		RG_footer 		"r2 substitute(Standard "$SE" {l} {c})"			// (Optional) r2=include r2 in footer. substitute() enters what was in SE
-//																							  global, but also manually reformats footer to be centered.
-//																				(NOTE) could potentially affect other elements, since any 
-// 																					   left-aligned cells will be centered.
+// 																							  		Enter term you want listed that precedes the word "Errors."
+	global 		RT_footer 		"r2 substitute(Standard "$RT_SE standard" {l} {c})"			// (Optional) r2=include r2 in footer. substitute() enters what was in SE
+//																							  		global, but also manually reformats footer to be centered.
+//																							  		(NOTE) could potentially affect other elements, since any 
+// 																					  		  		left-aligned cells will be centered.
 	global 		reg_table 		"$RT_title $table_format $RT_columns $RT_coef b($RT_decimal) se($RT_decimal) $RT_stars $RT_footer" // Compiles all globals together. 
 
-* Set Summary Stats Table Format ************************************************************// Set to default format, with options to customize.	
+* Set Summary Stats Table Format ***********************************************// Set to default format, with options to customize.	
 	
-	global 		stat_cells		"cells("mean(pattern(1 1 0) fmt(%7.2f)) sd(pattern(1 1 0) fmt(%7.2f)) b(star pattern(0 0 1) fmt(%7.2f)) t(pattern(0 0 1) par fmt(%7.2f))")"	// 	
-	global 		stat_table		"tex $table_format $stat_cells"
-	
+	global 		stat_title		"title("Summary Statistics")"					// (Required) // For mutliple lines, use "Line1" "Line2" for multiple line.
+//																								 Remove if blank. 	
+	global 		stat_columns	"mtitles("Treatment" "Control" "Diff") " 		// (Required) // Customize table columns by order L-R : "Name1" "Name2" ...
+// 																								 Remove if not customized. 
+	global 		stat_cells		"cells("mean(pattern(1 1 0) fmt(%7.2f)) sd(pattern(1 1 0) fmt(%7.2f)) b(star pattern(0 0 1) fmt(%7.2f)) t(pattern(0 0 1) par fmt(%7.2f))")"	
+// 																				Table default will display mean & sd for the two samples that are being compared, with the 3rd model being the difference between samples. 
+// 																				pattern() determines if that given statistic is going to be displayed in a particular model.
+	global 		stat_table		"tex $table_format $stat_title $stat_columns $stat_cells" // "tex" defines what kind of format the output will be, the rest compiles the commands together.
 	
 * Set Graph Formats ************************************************************
 
@@ -55,12 +59,11 @@ set varabbrev 	off
 	global 		axis_titles		 "xtitle() ytitle()" 							 // (Required) // Axis titles. Remove if n/a. 
 	global 		graph_vert		 "xline(0.5, lcol(stone) lwidth(medthick))"		 // (Required) // Placement on x-axis, followed by color and thickness.
 // 																								  Remove if N/A					
-	
 	global 		graph 			 "$graph_format $graph_legend $axis_titles $graph_vert"
 
 * Regressions  *****************************************************************
 
-	global 		regression		"x"			// (Required) // Replace "x" with what type of options are being used after "," in regression
+	global 		regression		"x"												// (Required) // Replace "x" with what type of options are being used after "," in regression
 	
 ********************************************************************************
 ****						  				  								****
@@ -77,6 +80,21 @@ set varabbrev 	off
 ****						  Balance Testing	  							****
 ****						  				  								****
 ********************************************************************************
+	
+	local 		stat_vars		"x"												// (Required) // Enter variables that are to be measured.
+	
+	local 		stat_sample		"x" 											// (Required) // Enter variable of sample population that you want to compare.
 
+	eststo 		clear
+	eststo: 	estpost sum 	`stat_vars' 		if `stat_sample' == 0
+	eststo: 	estpost sum 	`stat_vars' 		if `stat_sample' == 1	
+	eststo: 	estpost ttest 	`stat_vars' 		, by(`stat_sample') unequal 
 
+	esttab 		using "`output_dir'table_1_locals", $stat_table 							// (Required) // Replace "..." with table file name.  
+	eststo 		clear 
 
+********************************************************************************
+****						  				  								****
+****							  Estimation	  							****
+****						  				  								****
+********************************************************************************
