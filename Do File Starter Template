@@ -1,33 +1,46 @@
 clear
-set varabbrev 	off
 
 ********************************************************************************
 ****						  				  								****
-****						 Set Global Macros	  							****
+****						 Set Macros	  	           						****
 ****						  				  								****
 ********************************************************************************
 
-* Set Working Directory	******************************************************** Remember PC paths use "\" while MacOS use "/" paths
-// 																				 	Either set wd to current project that has folders: 
-// 																				 	Original, Working_Data, & Outputs.
-//																				 	Or use the following globals:
-	local 		WD 				"x" 											// (Required) // Replace "x" with path for WD manually. Using locals due to it's defined endline symbol is easier to fit in the root path code.
-	local 		OS				"x" 											// (Required) // Replace "x" with "/" for MacOS, OR "\" for PC	
-	local 		data_dir 		`WD'Original`OS' 	 							// Path to source data
-	local 		work_dir 		`WD'Working_Data`OS' 							// Path to any produced data files within project
-	local 		output_dir 		`WD'Outputs`OS' 								// Path to any produced materials from project (e.g. Tables, Graphs, etc.)
+* Set Project Folder Paths *****************************************************
+
+	local 		project 		"X"												// (NOTE) Only required for Razvan and Grant	
+																				// (Required) // replace "X" with project folder name
+	
+	local 		data_dir 		"original_data\" 	 							// Path to source data
+	local 		work_dir 		"working_data\" 								// Path to any produced data files within project
+	local 		output_dir 		"outputs\" 										// Path to any produced materials from project (e.g. Tables, Graphs, etc.)
+
+* Set Current Directory	******************************************************** 
+
+	if 		"`c(username)'" != "VLAICU" & "`c(username)'" != "GRANTS" { 	  	// (NOTE) 	Only Required for external users.
+				cd "X"															// (Required) // Replace "X" with directory path to project. Make sure project has all three folders above.
+}	
+
+	if 		"`c(username)'" == "GRANTS" {
+				cd "C:\Users\grants\OneDrive - Inter-American Development Bank Group\VlaicuShared\GStorerShared\1.Projects\\`project'\"
+} 																				// Will set current directory to Grant's path if username is listed as "GRANTS"
+
+	if 		"`c(username)'" == "VLAICU" {
+				cd "C:\Users\vlaicu\OneDrive - Inter-American Development Bank Group\VlaicuShared\GStorerShared\1.Projects\\`project'\"
+} 																				// Will set current directory to Razvan's path if username is listed as "VLAICU"	
+
 
 * Set General Tables Format ****************************************************// Set of commands that will be applied to all tables.
 	
-	global 		table_format 	"replace label compress nogaps"					// (Optional)   "replace"/"ammend" = overwrite file, "label" = use of var labels instad of var names,  
-// 																							    	"compress" = table width, "nogaps"/"gaps" = table height	
+	global 		table_format 	"replace label compress nogaps booktabs"		// (Optional)   "replace"/"ammend" = overwrite file, "label" = use of var labels instad of var names,  
+// 																							    	"compress" = table width, "nogaps"/"gaps" = table height, "booktabs" = Overleaf LaTeX table format.	
 	
 * Set Regression Table Format **************************************************// Set to default format, with options to customize.
 	
-	global 		RT_title		"title("")"										// (Required) // For mutliple lines, use "Line1" "Line2" for multiple line.
-//																								 	Remove if blank. 
-	global 		RT_columns 		"mtitles("") "   		// (Required) // Customize table columns by order L-R : "Name1" "Name2" ...
-// 																								 	Remove if not customized. 
+	global 		RT_title		"title("Line1" "Line2")"										// (Manual) // For mutliple lines, use "Line1" "Line2" for multiple line.
+//																								 	Remove all string except for "" if not used.
+	global 		RT_columns 		"mtitles("Name1" "Name2") "   								// (Manual) // Customize table columns by order L-R : "Name1" "Name2" ...
+// 																								 	Remove all string except for "" if not used.
 //																								 	(NOTE) Removes dependent variable displayed. 
 // 																									May need to add note or use different command.	
 	global 		RT_coef			"coeflabels( _cons "Constant" )"				// (Optional) Customize all coefficients with coeflabels: (var) "New Name" ...
@@ -35,7 +48,7 @@ set varabbrev 	off
 	global 		RT_stars		"star(* .10 ** .05 *** .01)"					// (Optional) To change, order within goes: (symbol) (value) ...
 	global 		RT_SE			"Standard"										// (Optional) Replace "Standard" with type of standard errors if not normal.
 // 																							  		Enter term you want listed that precedes the word "Errors."
-	global 		RT_footer 		"r2 substitute(Standard "$RT_SE standard" {l} {c})"			// (Optional) r2=include r2 in footer. substitute() enters what was in SE
+	global 		RT_footer 		"r2 substitute(Standard "$RT_SE standard" {l} {c})"	// (Optional) r2=include r2 in footer. substitute() enters what was in SE
 //																							  		global, but also manually reformats footer to be centered.
 //																							  		(NOTE) could potentially affect other elements, since any 
 // 																					  		  		left-aligned cells will be centered.
@@ -43,27 +56,27 @@ set varabbrev 	off
 
 * Set Summary Stats Table Format ***********************************************// Set to default format, with options to customize.	
 	
-	global 		stat_title		"title("Summary Statistics")"					// (Required) // For mutliple lines, use "Line1" "Line2" for multiple line.
-//																								 Remove if blank. 	
-	global 		stat_columns	"mtitles("Treatment" "Control" "Diff") " 		// (Required) // Customize table columns by order L-R : "Name1" "Name2" ...
-// 																								 Remove if not customized. 
+	global 		stat_title		"title("Summary Statistics")"					// (Manual) // For mutliple lines, use "Line1" "Line2" for multiple line.
+//																								 Remove all string except for "" if not used.
+	global 		stat_columns	"mtitles("Treatment" "Control" "Diff") " 		// (Manual) // Customize table columns by order L-R : "Name1" "Name2" ...
+// 																								Remove all string except for "" if not used. 
 	global 		stat_cells		"cells("mean(pattern(1 1 0) fmt(%7.2f)) sd(pattern(1 1 0) fmt(%7.2f)) b(star pattern(0 0 1) fmt(%7.2f)) t(pattern(0 0 1) par fmt(%7.2f))")"	
-// 																				Table default will display mean & sd for the two samples that are being compared, with the 3rd model being the difference between samples. 
+// 																				// (Optional) Table default will display mean & sd for the two samples that are being compared, with the 3rd model being the difference between samples. 
 // 																				pattern() determines if that given statistic is going to be displayed in a particular model.
-	global 		stat_table		"tex $table_format $stat_title $stat_columns $stat_cells" // "tex" defines what kind of format the output will be, the rest compiles the commands together.
+	global 		stat_table		"$table_format $stat_title $stat_columns $stat_cells" // Compiles macros together.
 	
 * Set Graph Formats ************************************************************
 
-	global 		graph_format	 "graphregion(fcolor(navy%12)) plotregion(fcol(forest_green%12))"  // Personal default color scheme
-	global 		graph_legend	 "legend(order() span size(small) color(white))" // Order (number) "name" (number) "name" ... 
-	global 		axis_titles		 "xtitle() ytitle()" 							 // (Required) // Axis titles. Remove if n/a. 
-	global 		graph_vert		 "xline(0.5, lcol(stone) lwidth(medthick))"		 // (Required) // Placement on x-axis, followed by color and thickness.
-// 																								  Remove if N/A					
+	global 		graph_format	 "graphregion(fcolor(navy%12)) plotregion(fcol(forest_green%12))" // (Optional) Personal default color scheme
+	global 		graph_legend	 "legend(order() span size(small) color(white))" // (Manual) // Order (number) "name" (number) "name" ... 
+	global 		axis_titles		 "xtitle() ytitle()" 							 // (Manual) // Axis titles. Remove if n/a. 
+	global 		graph_vert		 "xline(0.5, lcol(stone) lwidth(medthick))"		 // (Manual) // Placement on x-axis, followed by color and thickness.
+// 																								  Remove all string except for "" if not used.			
 	global 		graph 			 "$graph_format $graph_legend $axis_titles $graph_vert"
 
 * Regressions  *****************************************************************
 
-	global 		regression		"x"												// (Required) // Replace "x" with what type of options are being used after "," in regression
+	global 		regression		"x"												// (Manual) // Replace "x" with what type of options are being used after "," in regression
 	
 ********************************************************************************
 ****						  				  								****
@@ -81,16 +94,16 @@ set varabbrev 	off
 ****						  				  								****
 ********************************************************************************
 	
-	local 		stat_vars		"x"												// (Required) // Enter variables that are to be measured.
+	local 		stat_vars		"x"												// (Manual) // Enter variables that are to be measured.
 	
-	local 		stat_sample		"x" 											// (Required) // Enter variable of sample population that you want to compare.
+	local 		stat_sample		"x" 											// (Manual) // Enter variable of sample population that you want to compare.
 
 	eststo 		clear
 	eststo: 	estpost sum 	`stat_vars' 		if `stat_sample' == 0
 	eststo: 	estpost sum 	`stat_vars' 		if `stat_sample' == 1	
 	eststo: 	estpost ttest 	`stat_vars' 		, by(`stat_sample') unequal 
 
-	esttab 		using "`output_dir'table_1_locals", $stat_table 							// (Required) // Replace "..." with table file name.  
+	esttab 		using "`output_dir'table_1_locals", $stat_table 				// (Manual) // Replace "..." with table file name.  
 	eststo 		clear 
 
 ********************************************************************************
@@ -98,3 +111,5 @@ set varabbrev 	off
 ****							  Estimation	  							****
 ****						  				  								****
 ********************************************************************************
+
+
