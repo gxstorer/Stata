@@ -1,5 +1,46 @@
 clear
+set varabbrev 	off
+********************************************************************************
+****                                                                        ****
+****                           READ ME                                      ****
+****                                                                        ****
+********************************************************************************
+/*
+   1. This template is designed to automate outputs as efficiently as possible through the use of macros.
+      Many outputs are intended to follow a consistent design to enhance readibility,
+      but implementing a custom design and maintaining consistency is quite cumbersome. 
 
+   2. You can use this template as a generalize template that is used for the entire project, or can be output-specific as well. 
+      If the entire project resides in a single do-file, then macros that are output-specific like "title" should be left blank.
+      However, if each output is a separate do-file, then use the template of "Set General Tables Format" should be in the main do-file,
+      to ensure that the aspects of the outputs you want to be consistent in all tables can be modified in a single update,
+      and table-specific commands are in each unique do-file. 
+
+   3. Each line of code generally falls into 4 columns:
+   		(1) command (2) command code (3) command syntax (4) comments
+        * Lengthy command codes and syntax are spaced into multiple columns for better visability.
+
+    4. Comments will explain what the code does, but also will highlight if there is a manual entry that is needed that are categorized as:
+      // (Required) // : User must make some kind of action before running do-files
+      // (Manual)   // 	: (During editing phase), editor will have to make a manual change from template before running do-files.
+      // (Optional)    	: User may manually change code syntax if applicable.
+      // (NOTE)        	: Additional information regarding manual changes of given code.
+
+    5. Project folders should have at least three folders in it: "original_data", "working_data", & "outputs" 
+       orginal_data: 	A folder where any source data that the project is based on is located. Keeping this separate helps ensure the preservation of the orignal data for reproducability.
+       working_data: 	A folder where any produced data within the project is located. Merging datasets, converting .CSV files into .DTA files will all be located here and separate from original data.
+       outputs:  		A folder where any produced results are located. Regression tables, summary statistics, graphs, etc. will all be found in this one folder. 
+
+    6. Check list for running this specific do-file: 
+          Ensure project folder holds the main 3 folders.
+ 			  Grant/Razvan: ensure the local macro "project" matches folder name in shared projects OverDrive folder.
+            External users: Set path to project as noted in the "Set Current Directory" section.
+          Review all "(Optional)" codes and confirm those options.
+		   Packages required: ESTOUT & REGHDFE
+		   If not currently downloaded, then manually enter these commands:
+		     ssc install estout
+			 ssc install reghdfe 
+*/
 ********************************************************************************
 ****						  				  								****
 ****						 Set Macros	  	           						****
